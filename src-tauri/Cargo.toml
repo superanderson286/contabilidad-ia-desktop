@@ -1,0 +1,33 @@
+# src-tauri/Cargo.toml
+
+[package]
+name = "contabilidad_desktop"
+version = "0.1.0"
+description = "Una aplicación de contabilidad de escritorio impulsada por IA."
+authors = ["Anderson Avila"]
+license = ""
+repository = ""
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0-rc.13", features = [] } # FIJADO a la última RC compatible
+
+[dependencies]
+dirs = "5.0.1"
+tauri = { version = "2.0.0-rc.13", features = [] } # FIJADO a la última RC compatible
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+uuid = { version = "1.9", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+tokio = { version = "1.38", features = ["rt-multi-thread", "macros", "fs", "sync"] }
+log = "0.4"
+env_logger = "0.11"
+dotenv = "0.15.0"
+
+tauri-plugin-shell = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
+tauri-plugin-log = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
+
+[features]
+default = []

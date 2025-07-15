@@ -1,0 +1,41 @@
+{
+  "name": "contabilidad-ia-desktop",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview",
+    "tauri": "cargo tauri",
+    "tailwind-init": "npx tailwindcss init -p"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.6.0",
+    "@tauri-apps/plugin-shell": "^2.3.0",
+    "@tauri-apps/plugin-window": "^2.0.0-alpha.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.6.2",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__template": "^7.4.4",
+    "@types/json-schema": "^7.0.15",
+    "@types/prop-types": "^15.7.15",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.x",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "postcss": "^8.x",
+    "tailwindcss": "^3.x",
+    "typescript": "^5.0.2",
+    "vite": "^7.0.4"
+  }
+}

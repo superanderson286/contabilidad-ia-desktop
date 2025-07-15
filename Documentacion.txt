@@ -1,0 +1,150 @@
+Documentación del Gestor de Contabilidad Multi-Tienda con IA
+Anderson Software & Solutions
+
+🚀 ¡Bienvenido/a al Gestor de Contabilidad con IA de Anderson Software & Solutions!
+
+Esta documentación proporciona una visión general de las funcionalidades, cómo usar la aplicación y las consideraciones importantes para esta versión. Tu feedback es crucial para el desarrollo futuro.
+
+💡 ¿Qué es el Gestor de Contabilidad con IA?
+
+Es una aplicación de escritorio diseñada para ayudarte a gestionar tus ingresos y gastos de múltiples tiendas o categorías, con la asistencia de una Inteligencia Artificial para responder a tus preguntas contables y analizar tus transacciones. Esta versión te permite experimentar las funcionalidades de registro, resumen, consulta a la IA y gestión avanzada de tiendas de manera local.
+
+✨ Características Clave
+
+    Registro de Transacciones:
+
+        Añade ingresos y gastos con monto, descripción y nombre de tienda.
+
+        Los montos se formatean automáticamente a un estilo de moneda español (punto para miles, coma para decimales).
+
+    Gestión Multi-Tienda:
+
+        Organiza tus transacciones por el nombre de la tienda (o categoría) que especifiques.
+
+        La aplicación detecta y te permite seleccionar tiendas existentes.
+
+        NUEVO: Edición y Eliminación de Tiendas: Ahora puedes editar el nombre de una tienda existente o eliminar una tienda completa (junto con todas sus transacciones asociadas) directamente desde la interfaz.
+
+    Resumen Detallado:
+
+        Visualiza el total de ingresos, gastos y el balance actual para todas las tiendas o para una tienda específica.
+
+        Consulta las últimas transacciones registradas.
+
+    Funcionalidad de Edición y Eliminación de Transacciones:
+
+        Edita cualquier transacción existente directamente desde la tabla de resumen.
+
+        Elimina transacciones individuales con una confirmación para evitar pérdidas accidentales.
+
+    Integración con IA (Gemini):
+
+        Haz preguntas sobre conceptos contables o tus propios datos (en el futuro, la IA podría analizar tus datos).
+
+        Requiere una GEMINI_API_KEY configurada en un archivo .env adjunto.
+
+    NUEVO: Análisis de Transacciones con IA:
+
+        La IA ahora puede analizar patrones en tus ingresos y gastos, identificar tendencias o anomalías, y ofrecerte insights basados en tus datos transaccionales. Esta función te ayuda a comprender mejor tu situación financiera.
+
+    Persistencia Local:
+
+        Tus transacciones se guardan automáticamente en un archivo local (transactions.json) para que no pierdas tus datos entre sesiones.
+
+🛠️ Cómo Usar la Aplicación
+
+Esta aplicación está diseñada para ser completamente autónoma y no requiere la instalación de ninguna otra dependencia adicional en el equipo de tu cliente.
+
+    Preparación e Instalación de la Aplicación:
+
+        Recibirás un archivo de instalación .msi que contiene la aplicación principal y los archivos de configuración necesarios.
+
+        Ejecuta el archivo .msi y sigue las instrucciones del instalador. La aplicación se instalará en la ubicación predeterminada o en la que elijas.
+
+        Es importante que, una vez instalada, los archivos de configuración (como .env) permanezcan en la carpeta de instalación de la aplicación.
+
+    Configura tu Clave de la IA (GEMINI_API_KEY):
+
+        La aplicación utiliza Inteligencia Artificial (IA) para algunas funciones y necesita una clave para acceder a ella.
+
+        Dentro de la carpeta de instalación de la aplicación, abre el archivo .env (sin nombre, solo la extensión .env) con el Bloc de notas o cualquier editor de texto simple.
+
+        Encontrarás una línea similar a: GEMINI_API_KEY=TU_CLAVE_API_DE_GEMINI_AQUI
+
+        Reemplaza TU_CLAVE_API_DE_GEMINI_AQUI con tu clave real de la API de Google Gemini. (Si no tienes una, puedes obtenerla en Google AI Studio).
+
+        Guarda el archivo .env después de hacer el cambio. Es crucial que el nombre del archivo siga siendo .env (sin ninguna otra extensión como .txt).
+
+    Ejecuta la Aplicación: Simplemente haz doble clic en el icono de la aplicación en tu escritorio o en el archivo ejecutable contabilidad_desktop.exe dentro de la carpeta de instalación.
+
+    Registrar Transacciones:
+
+        Ve a la pestaña "➕ Ingresar Transacción".
+
+        Introduce el Monto, una Descripción y el Nombre de la Tienda.
+
+        Selecciona si es un Ingreso o un Gasto.
+
+        Haz clic en "✅ Registrar Transacción".
+
+    Consultar el Resumen:
+
+        Ve a la pestaña "📈 Resumen y Reportes".
+
+        Usa el selector "Seleccionar Tienda" para ver el resumen de todas las tiendas o de una específica.
+
+        Aquí también podrás "✏️ Editar" o "🗑️ Eliminar" transacciones individuales.
+
+    Gestionar Tiendas:
+
+        Dirígete a la sección de gestión de tiendas (la ubicación exacta puede variar en la interfaz, busca un botón o pestaña relacionado con "Tiendas" o "Configuración").
+
+        Desde allí, podrás editar los nombres de las tiendas existentes o eliminarlas junto con sus transacciones.
+
+    Preguntar a la IA y Analizar Transacciones:
+
+        Ve a la pestaña "🤖 Preguntar a la IA".
+
+        Escribe tu pregunta en el campo de texto.
+
+        Haz clic en "🤔 Pregúntame algo" para obtener una respuesta de la IA sobre conceptos contables.
+
+        Para el análisis de transacciones, busca una opción o botón dentro de esta pestaña o en la de "Resumen y Reportes" que diga "Analizar con IA" o similar. Haz clic para que la IA procese tus datos y te ofrezca insights.
+
+⚠️ Consideraciones y Limitaciones
+
+Esta es una versión en desarrollo y puede contener los siguientes aspectos:
+
+    Sin Garantías: La aplicación se proporciona "tal cual", sin garantías de ningún tipo.
+
+    Posibles Errores (Bugs): Es posible que encuentres errores o comportamientos inesperados.
+
+    Funcionalidades en Desarrollo: Algunas características pueden no estar completamente desarrolladas o pueden faltar.
+
+    Sin Respaldo en la Nube: Los datos se guardan solo localmente. Si borras el archivo transactions.json, perderás tus datos. No hay sincronización en la nube en esta versión.
+
+    Rendimiento: El rendimiento puede no estar optimizado en todas las áreas.
+
+    Seguridad de la API Key: La GEMINI_API_KEY se lee del archivo .env. Mantener este archivo seguro es responsabilidad del usuario, ya que la clave API puede ser utilizada para acceder a los servicios de IA.
+
+🐛 Cómo Reportar Errores y Enviar Feedback
+
+Tu ayuda es invaluable. Si encuentras un error, tienes una sugerencia o deseas compartir tu experiencia, por favor:
+
+    Contacta al Desarrollador: soporte.contabilidad.ia.app@gmail.com
+
+➡️ Próximos Pasos (Versión Premium)
+
+Estamos trabajando en una versión premium que incluirá:
+
+    Sincronización en la nube: Accede a tus datos desde cualquier dispositivo.
+
+    Reportes avanzados: Gráficos, análisis de tendencias y exportación de datos.
+
+    Integración bancaria: Conecta tus cuentas para una importación automática de transacciones.
+
+    Categorización inteligente: La IA ayudará a categorizar tus gastos automáticamente.
+
+    Soporte prioritario.
+
+¡Gracias por usar el Gestor de Contabilidad con IA de Anderson Software & Solutions!

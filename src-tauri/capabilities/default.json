@@ -1,0 +1,18 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permisos para la ventana principal",
+  "windows": ["*"],
+  "permissions": [
+    "core:event:default", 
+    "core:path:default",  
+    
+    "core:window:allow-minimize",
+    "core:window:allow-maximize",
+    "core:window:allow-close",
+    "core:window:allow-start-dragging",
+    "core:window:allow-unmaximize",
+    "core:window:allow-is-maximized",
+    "shell:allow-open"
+  ]
+}

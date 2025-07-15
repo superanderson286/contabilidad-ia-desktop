@@ -1,0 +1,65 @@
+/* src/App.css */
+.container {
+  margin: 20px;
+  font-family: sans-serif;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #282c34; /* Dark background */
+  color: #abb2bf; /* Light text */
+}
+
+h1 {
+  color: #61dafb; /* React blue */
+  margin-bottom: 20px;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.greet-input-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+input {
+  padding: 10px;
+  border: 1px solid #3e4451;
+  border-radius: 5px;
+  background-color: #3e4451;
+  color: #abb2bf;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #61dafb;
+  color: #282c34;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #21a1f1;
+}
+
+p {
+  margin-top: 20px;
+  font-size: 1.1em;
+}
