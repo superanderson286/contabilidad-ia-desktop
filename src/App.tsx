@@ -94,6 +94,10 @@ function App() {
   const [iaSummary, setIaSummary] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
 
+  // Estados para el modal de API Key
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+
   // Obtener la instancia de la ventana actual de Tauri
   const appWindow = getCurrentWindow();
 
@@ -458,6 +462,23 @@ ${JSON.stringify(transactions, null, 2)}
     }
   };
 
+  const handleSaveApiKey = async () => {
+    console.log('Frontend: handleSaveApiKey called.');
+    // Basic validation for Gemini API key format
+    if (!apiKey || !/^[a-zA-Z0-9_]{30,}$/.test(apiKey)) {
+      setStatusMessage('❌ Formato de API Key inválido. Debe tener al menos 30 caracteres alfanuméricos.');
+      return;
+    }
+    try {
+      await invoke('save_api_key_command', { apiKey });
+      setStatusMessage('✅ API Key guardada correctamente.');
+      setShowApiKeyModal(false);
+    } catch (e: any) {
+      console.error('Frontend: Error saving API key:', e);
+      setStatusMessage(`Error al guardar la API Key: ${e}`);
+    }
+  };
+
   const filteredTransactions = allStores[selectedStoreIndex] === 'Todas las Tiendas'
     ? transactions
     : transactions.filter(t => t.store_name === allStores[selectedStoreIndex]);
@@ -703,6 +724,22 @@ ${JSON.stringify(transactions, null, 2)}
                   >
                     📊 Analizar transacciones con IA
                   </button>
+                  <button
+                    onClick={() => setShowApiKeyModal(true)}
+                    className="ml-4 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
+                  >
+                    🔑 Ingresar API Key
+                  </button>
+                </div>
+
+                <div className="mt-4 text-center">
+                  <a
+                    href="#"
+                    onClick={() => open('https://aistudio.google.com/app/apikey')}
+                    className="text-sm text-blue-400 hover:underline"
+                  >
+                    ¿No tienes una API Key? Consíguela aquí en Google AI Studio.
+                  </a>
                 </div>
 
                 {analyzing && (
@@ -849,6 +886,42 @@ ${JSON.stringify(transactions, null, 2)}
             )}
           </div>
         </div>
+
+        {/* API Key Modal */}
+        {showApiKeyModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+            <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
+              <h2 className="text-2xl font-bold text-gray-200 mb-6">Ingresar API Key de Gemini</h2>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="api-key-input" className="block text-gray-300 text-sm font-bold mb-2">API Key:</label>
+                  <input
+                    id="api-key-input"
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white placeholder-gray-400"
+                    placeholder="Ingresa tu API Key de Gemini"
+                  />
+                </div>
+              </div>
+              <div className="mt-8 flex justify-end space-x-4">
+                <button
+                  onClick={handleSaveApiKey}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
+                >
+                  💾 Guardar
+                </button>
+                <button
+                  onClick={() => setShowApiKeyModal(false)}
+                  className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
+                >
+                  ❌ Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Edit Transaction Modal */}
         {showEditModal && editingTransaction && (

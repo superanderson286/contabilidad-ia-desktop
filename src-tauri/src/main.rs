@@ -15,6 +15,8 @@ use chrono::Utc;
 use std::sync::Mutex;
 use tauri::State;
 use log::{info, debug, error, warn}; // Import debug, error, and warn
+use std::io::{BufRead, BufReader, Write};
+use std::fs::{File, OpenOptions};
 
 // --- Estructuras de Datos de la Aplicación ---
 
@@ -430,6 +432,57 @@ async fn delete_store_command(
     }
 }
 
+#[tauri::command]
+async fn save_api_key_command(api_key: String) -> Result<(), String> {
+    let env_path = match std::env::current_dir() {
+        Ok(mut path) => {
+            path.push(".env");
+            path
+        },
+        Err(e) => return Err(format!("Failed to get current directory: {}", e)),
+    };
+
+    let mut lines: Vec<String> = if env_path.exists() {
+        let file = File::open(&env_path).map_err(|e| format!("Failed to open .env file: {}", e))?;
+        let reader = BufReader::new(file);
+        reader.lines().collect::<Result<Vec<String>, _>>().map_err(|e| format!("Failed to read lines from .env: {}", e))?
+    } else {
+        Vec::new()
+    };
+
+    let key_to_set = "GEMINI_API_KEY";
+    let new_line = format!("{}={}", key_to_set, api_key);
+    let mut key_found = false;
+
+    for line in &mut lines {
+        if line.starts_with(key_to_set) {
+            *line = new_line.clone();
+            key_found = true;
+            break;
+        }
+    }
+
+    if !key_found {
+        lines.push(new_line);
+    }
+
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(&env_path)
+        .map_err(|e| format!("Failed to open .env file for writing: {}", e))?;
+
+    for line in lines {
+        writeln!(file, "{}", line).map_err(|e| format!("Failed to write to .env file: {}", e))?;
+    }
+    
+    // After saving, we need to reload the environment variables for the current process
+    dotenv::from_path(&env_path).ok();
+
+    Ok(())
+}
+
 /// Comando para llamar a la API de Google Gemini.
 #[tauri::command]
 async fn call_gemini_api_command(prompt: String) -> Result<String, String> {
@@ -568,6 +621,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             update_transaction_command,
             delete_transaction_command,
             get_unique_stores,
+            save_api_key_command,
             call_gemini_api_command,
             format_currency_es_ea_command,
             get_store_info_command,
