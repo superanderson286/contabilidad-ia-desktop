@@ -15,6 +15,7 @@ tauri-build = { version = "2.0.0-rc.13", features = [] } # FIJADO a la última R
 [dependencies]
 dirs = "5.0.1"
 tauri = { version = "2.0.0-rc.13", features = [] } # FIJADO a la última RC compatible
+locale_config = "0.3" # Added for language detection
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

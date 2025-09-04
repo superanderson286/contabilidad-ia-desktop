@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core'; // Tauri v2 API
 import { open } from '@tauri-apps/plugin-shell'; // Tauri v2 API
 import { getCurrentWindow } from '@tauri-apps/api/window'; // Importado para el evento tauri://ready y control de ventana
+import { useTranslation } from 'react-i18next'; // Import useTranslation
+import appIcon from '../app_icon.png';
 
 // Declare global interface for __TAURI_IPC__ to resolve TypeScript error
 // This tells TypeScript that `__TAURI_IPC__` might exist on the `window` object.
@@ -52,8 +54,10 @@ const formatCurrencyJs = (amount: number): string => {
 
 
 function App() {
+  const { t, i18n } = useTranslation(); // Initialize useTranslation hook
+  const allStoresLabel = t('all_stores');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [allStores, setAllStores] = useState<string[]>(['Todas las Tiendas']);
+  const [allStores, setAllStores] = useState<string[]>([allStoresLabel]);
   const [selectedStoreIndex, setSelectedStoreIndex] = useState(0);
   const [currentTab, setCurrentTab] = useState('input');
   const [statusMessage, setStatusMessage] = useState('');
@@ -164,15 +168,13 @@ ${JSON.stringify(transactions, null, 2)}
     try {
       const result: string[] = await invoke('get_unique_stores');
       console.log('Frontend: get_unique_stores successful, received:', result);
-      // Asegurarse de que 'Todas las Tiendas' esté siempre al principio si existe
-      const filteredResult = result.filter(s => s !== 'Todas las Tiendas');
-      setAllStores(['Todas las Tiendas', ...filteredResult.sort()]);
-      console.log('Frontend: allStores state updated to:', ['Todas las Tiendas', ...filteredResult.sort()]);
+      setAllStores([allStoresLabel, ...result.sort()]);
+      console.log('Frontend: allStores state updated to:', [allStoresLabel, ...result.sort()]);
     } catch (e: any) {
       console.error('Frontend: Error fetching unique stores:', e);
       setStatusMessage(`Error al cargar tiendas: ${e}`);
     }
-  }, []);
+  }, [allStoresLabel]);
 
   const fetchStoreInfo = useCallback(async () => {
     console.log('Frontend: Calling get_store_info_command...');
@@ -215,9 +217,9 @@ ${JSON.stringify(transactions, null, 2)}
     console.log('Frontend: allStores state or selectedStoreIndex changed. Current allStores:', allStores);
     const currentStoreName = allStores[selectedStoreIndex];
     if (!allStores.includes(currentStoreName)) {
-      setSelectedStoreIndex(allStores.indexOf('Todas las Tiendas'));
+      setSelectedStoreIndex(allStores.indexOf(allStoresLabel));
     }
-  }, [allStores, selectedStoreIndex]);
+  }, [allStores, selectedStoreIndex, allStoresLabel]);
 
   // Refrescar info de tiendas y transacciones cuando la pestaña cambia
   useEffect(() => {
@@ -362,9 +364,9 @@ ${JSON.stringify(transactions, null, 2)}
       console.warn('Frontend: Rename store failed due to empty name.');
       return;
     }
-    if (storeToEdit === "Todas las Tiendas") {
-      setStatusMessage("No se puede renombrar 'Todas las Tiendas'.");
-      console.warn("Frontend: Rename store failed for 'Todas las Tiendas'.");
+    if (storeToEdit === allStoresLabel) {
+      setStatusMessage(t("cannot_rename_all_stores"));
+      console.warn("Frontend: Rename store failed for 'All Stores'.");
       return;
     }
     if (newStoreName.trim() === "") { // New check for empty new store name
@@ -411,10 +413,10 @@ ${JSON.stringify(transactions, null, 2)}
       console.warn('Frontend: Delete store failed: no store selected.');
       return;
     }
-    if (storeToDelete === "Todas las Tiendas") {
-      setStatusMessage("No se puede eliminar 'Todas las Tiendas'.");
+    if (storeToDelete === allStoresLabel) {
+      setStatusMessage(t("cannot_delete_all_stores"));
       setStoreDeleteModal(false);
-      console.warn("Frontend: Delete store failed for 'Todas las Tiendas'.");
+      console.warn("Frontend: Delete store failed for 'All Stores'.");
       return;
     }
 
@@ -479,7 +481,7 @@ ${JSON.stringify(transactions, null, 2)}
     }
   };
 
-  const filteredTransactions = allStores[selectedStoreIndex] === 'Todas las Tiendas'
+  const filteredTransactions = allStores[selectedStoreIndex] === allStoresLabel
     ? transactions
     : transactions.filter(t => t.store_name === allStores[selectedStoreIndex]);
 
@@ -506,26 +508,35 @@ ${JSON.stringify(transactions, null, 2)}
         data-tauri-drag-region
         className="h-8 bg-gray-800 bg-opacity-70 backdrop-blur-sm w-full flex justify-between items-center px-4"
       >
-        <span className="text-sm font-semibold text-gray-300">Contabilidad IA App</span>
-        <div className="flex space-x-1">
+        <div className="flex items-center space-x-2">
+          <img src={appIcon} alt="App Icon" className="h-5 w-5" />
+          <span className="text-sm font-semibold text-gray-300">{t('accounting_ia_app')}</span>
+        </div>
+        <div className="flex items-center space-x-2"> {/* Added items-center for vertical alignment */}
+          <button
+            onClick={() => i18n.changeLanguage(i18n.language === 'en' ? 'es' : 'en')}
+            className="px-2 py-1 rounded-md text-xs font-semibold text-blue-200 hover:bg-gray-700 transition-colors"
+          >
+            {t('change_language')}
+          </button>
           <button
             onClick={handleMinimize}
             className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-700"
-            aria-label="Minimizar"
+            aria-label={t('minimize')}
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
           <button
             onClick={handleMaximizeToggle}
             className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-700"
-            aria-label="Maximizar/Restaurar"
+            aria-label={t('maximize_restore')}
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
           </button>
           <button
             onClick={handleClose}
             className="w-7 h-7 flex items-center justify-center rounded hover:bg-red-500"
-            aria-label="Cerrar"
+            aria-label={t('close')}
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
@@ -536,7 +547,7 @@ ${JSON.stringify(transactions, null, 2)}
       <div className="flex flex-col items-center p-6 w-full flex-grow">
         {/* Header */}
         <h1 className="text-3xl font-bold text-blue-400 mb-6">
-          📊 Gestor de Contabilidad Multi-Tienda con IA
+          {t('welcome')}
         </h1>
 
         {/* Tabs */}
@@ -547,7 +558,7 @@ ${JSON.stringify(transactions, null, 2)}
               currentTab === 'input' ? 'bg-blue-600 text-white shadow-md' : 'text-blue-200 hover:bg-gray-700'
             }`}
           >
-            ➕ Ingresar Transacción
+            {t('add_transaction')}
           </button>
           <button
             onClick={() => setCurrentTab('summary')}
@@ -555,7 +566,7 @@ ${JSON.stringify(transactions, null, 2)}
               currentTab === 'summary' ? 'bg-blue-600 text-white shadow-md' : 'text-blue-200 hover:bg-gray-700'
             }`}
           >
-            📈 Resumen y Reportes
+            {t('summary_and_reports')}
           </button>
           <button
             onClick={() => setCurrentTab('ai')}
@@ -563,7 +574,7 @@ ${JSON.stringify(transactions, null, 2)}
               currentTab === 'ai' ? 'bg-blue-600 text-white shadow-md' : 'text-blue-200 hover:bg-gray-700'
             }`}
           >
-            🤖 Preguntar a la IA
+            {t('ask_the_ai')}
           </button>
           <button
             onClick={() => setCurrentTab('stores')}
@@ -571,13 +582,13 @@ ${JSON.stringify(transactions, null, 2)}
               currentTab === 'stores' ? 'bg-blue-600 text-white shadow-md' : 'text-blue-200 hover:bg-gray-700'
             }`}
           >
-            🏪 Gestionar Tiendas
+            {t('manage_stores')}
           </button>
           <button
               onClick={() => open('https://contabilidad-ia-web.vercel.app/')}
               className="px-4 py-2 rounded-md font-semibold text-blue-200 hover:bg-gray-700 transition-colors ml-auto"
           >
-              🌐 Visitar la Web
+              {t('visit_the_web')}
           </button>
         </div>
 
@@ -592,10 +603,10 @@ ${JSON.stringify(transactions, null, 2)}
         <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-4xl flex-grow overflow-y-auto">
           {currentTab === 'input' && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-200 mb-6">📝 Registrar Nueva Transacción</h2>
+              <h2 className="text-2xl font-bold text-gray-200 mb-6">{t('register_new_transaction')}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="new-amount" className="block text-gray-300 text-sm font-bold mb-2">Monto:</label>
+                  <label htmlFor="new-amount" className="block text-gray-300 text-sm font-bold mb-2">{t('amount')}</label>
                   <input
                     id="new-amount"
                     type="number"
@@ -607,7 +618,7 @@ ${JSON.stringify(transactions, null, 2)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="new-description" className="block text-gray-300 text-sm font-bold mb-2">Descripción:</label>
+                  <label htmlFor="new-description" className="block text-gray-300 text-sm font-bold mb-2">{t('description')}</label>
                   <input
                     id="new-description"
                     type="text"
@@ -618,7 +629,7 @@ ${JSON.stringify(transactions, null, 2)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="new-store-name-input" className="block text-gray-300 text-sm font-bold mb-2">Nombre de la Tienda:</label>
+                  <label htmlFor="new-store-name-input" className="block text-gray-300 text-sm font-bold mb-2">{t('store_name')}</label>
                   <input
                     id="new-store-name-input"
                     type="text"
@@ -627,7 +638,7 @@ ${JSON.stringify(transactions, null, 2)}
                     className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white placeholder-gray-400"
                     placeholder="Ej: Supermercado XYZ"
                   />
-                  <label htmlFor="new-store-select" className="block text-gray-300 text-sm font-bold mt-4 mb-2">O selecciona una existente:</label>
+                  <label htmlFor="new-store-select" className="block text-gray-300 text-sm font-bold mt-4 mb-2">{t('or_select_an_existing_one')}</label>
                   <select
                     id="new-store-select"
                     value={newStore} // Ahora el select también se vincula a newStore
@@ -635,19 +646,19 @@ ${JSON.stringify(transactions, null, 2)}
                     className="block w-full mt-2 py-2 px-3 rounded-md bg-gray-700 border-gray-600 text-gray-100 focus:outline-none focus:shadow-outline"
                     key={allStores.length > 0 ? allStores.join('-') : 'empty'} // Mantiene la clave para forzar re-render
                   >
-                    <option value="">Selecciona una tienda existente...</option>
+                    <option value="">{t('select_existing_store')}</option>
                     {allStores
-                      .filter((s) => s !== 'Todas las Tiendas')
+                      .filter((s) => s !== allStoresLabel)
                       .map((store) => (
                         <option key={store} value={store}>
                           {store}
                         </option>
                       ))}
                   </select>
-                  <p className="text-xs text-gray-400 mt-1">Puedes escribir un nuevo nombre o seleccionar uno existente.</p>
+                  <p className="text-xs text-gray-400 mt-1">{t('you_can_type_a_new_name...')}</p>
                 </div>
                 <fieldset className="flex flex-col">
-                  <legend className="block text-gray-300 text-sm font-bold mb-2">Tipo de Transacción:</legend>
+                  <legend className="block text-gray-300 text-sm font-bold mb-2">{t('transaction_type')}</legend>
                   <div className="flex space-x-4">
                     <label htmlFor="new-type-ingreso" className="inline-flex items-center">
                       <input
@@ -659,7 +670,7 @@ ${JSON.stringify(transactions, null, 2)}
                         checked={newType === 'Ingreso'}
                         onChange={() => setNewType('Ingreso')}
                       />
-                      <span className="ml-2 text-gray-100">Ingreso</span>
+                      <span className="ml-2 text-gray-100">{t('income')}</span>
                     </label>
                     <label htmlFor="new-type-gasto" className="inline-flex items-center">
                       <input
@@ -671,7 +682,7 @@ ${JSON.stringify(transactions, null, 2)}
                         checked={newType === 'Gasto'}
                         onChange={() => setNewType('Gasto')}
                       />
-                      <span className="ml-2 text-gray-100">Gasto</span>
+                      <span className="ml-2 text-gray-100">{t('expense')}</span>
                     </label>
                   </div>
                 </fieldset>
@@ -681,7 +692,7 @@ ${JSON.stringify(transactions, null, 2)}
                   onClick={handleAddTransaction}
                   className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors text-lg"
                 >
-                  ✅ Registrar Transacción
+                  {t('register_transaction')}
                 </button>
               </div>
             </div>
@@ -689,9 +700,9 @@ ${JSON.stringify(transactions, null, 2)}
 
           {currentTab === 'summary' && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-200 mb-6">📈 Resumen y Reportes</h2>
+              <h2 className="text-2xl font-bold text-gray-200 mb-6">{t('summary_and_reports')}</h2>
               <div className="flex items-center mb-6">
-                <label htmlFor="store-selector" className="block text-gray-300 text-sm font-bold mr-3">Seleccionar Tienda:</label>
+                <label htmlFor="store-selector" className="block text-gray-300 text-sm font-bold mr-3">{t('select_store')}</label>
                 <select
                   id="store-selector"
                   value={selectedStoreIndex}
@@ -708,12 +719,12 @@ ${JSON.stringify(transactions, null, 2)}
 
               <div className="bg-gray-700 p-4 rounded-lg shadow-inner mb-6">
                 <h3 className="text-xl font-bold text-blue-300 mb-2">
-                  Tienda Seleccionada: {allStores[selectedStoreIndex]}
+                  {t('selected_store')} {allStores[selectedStoreIndex]}
                 </h3>
-                <p className="text-gray-200">Total Ingresos: {formatCurrencyJs(totalIngresos)}</p>
-                <p className="text-gray-200">Total Gastos: {formatCurrencyJs(totalGastos)}</p>
+                <p className="text-gray-200">{t('total_income')} {formatCurrencyJs(totalIngresos)}</p>
+                <p className="text-gray-200">{t('total_expenses')} {formatCurrencyJs(totalGastos)}</p>
                 <p className={`text-lg font-bold ${balance >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                  Balance Actual: {formatCurrencyJs(balance)}
+                  {t('current_balance')} {formatCurrencyJs(balance)}
                 </p>
               </div>
 
@@ -722,13 +733,13 @@ ${JSON.stringify(transactions, null, 2)}
                     onClick={handleAnalizarConIA}
                     className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all"
                   >
-                    📊 Analizar transacciones con IA
+                    {t('analyze_transactions_with_ai')}
                   </button>
                   <button
                     onClick={() => setShowApiKeyModal(true)}
                     className="ml-4 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all"
                   >
-                    🔑 Ingresar API Key
+                    {t('enter_api_key')}
                   </button>
                 </div>
 
@@ -738,55 +749,55 @@ ${JSON.stringify(transactions, null, 2)}
                     onClick={() => open('https://aistudio.google.com/app/apikey')}
                     className="text-sm text-blue-400 hover:underline"
                   >
-                    ¿No tienes una API Key? Consíguela aquí en Google AI Studio.
+                    {t('dont_have_an_api_key...')}
                   </a>
                 </div>
 
                 {analyzing && (
-                  <div className="mt-4 text-sm text-gray-400 text-center">Analizando con Gemini…</div>
+                  <div className="mt-4 text-sm text-gray-400 text-center">{t('loading')}</div>
                 )}
 
                 {iaSummary && (
                   <div className="mt-6 p-4 border border-indigo-300 bg-indigo-50 text-indigo-900 rounded-md shadow-md whitespace-pre-wrap">
-                    <h2 className="font-semibold text-lg mb-2">🧠 Informe IA</h2>
+                    <h2 className="font-semibold text-lg mb-2">🧠 {t('ai_response')}</h2>
                     {iaSummary}
                   </div>
                 )}
 
-              <h3 className="text-xl font-bold text-gray-200 mt-8 mb-4">Últimas Transacciones:</h3>
+              <h3 className="text-xl font-bold text-gray-200 mt-8 mb-4">{t('latest_transactions')}</h3>
               <div className="max-h-80 overflow-y-auto bg-gray-700 rounded-lg shadow-inner">
                 <table className="min-w-full divide-y divide-gray-600">
                   <thead className="bg-gray-600 sticky top-0">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Fecha/Hora</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Tipo/Monto</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Descripción/Tienda</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Acciones</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">{t('date_time')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">{t('type_amount')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">{t('description_store')}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">{t('actions')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700">
                     {filteredTransactions.length > 0 ? (
-                      filteredTransactions.slice().reverse().map((t) => (
-                        <tr key={t.id} className="hover:bg-gray-600 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{getLocalFormattedDate(t.timestamp)}</td>
+                      filteredTransactions.slice().reverse().map((transaction) => (
+                        <tr key={transaction.id} className="hover:bg-gray-600 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{getLocalFormattedDate(transaction.timestamp)}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
-                            <span className={`font-semibold ${t.type === 'Ingreso' ? 'text-green-300' : 'text-red-300'}`}>
-                              {t.type} {formatCurrencyJs(t.amount)}
+                            <span className={`font-semibold ${transaction.type === 'Ingreso' ? 'text-green-300' : 'text-red-300'}`}>
+                              {t(transaction.type === 'Ingreso' ? 'income' : 'expense')} {formatCurrencyJs(transaction.amount)}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{t.description} ({t.store_name})</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{transaction.description} ({transaction.store_name})</td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button
-                              onClick={() => handleEditTransaction(t)}
+                              onClick={() => handleEditTransaction(transaction)}
                               className="text-indigo-400 hover:text-indigo-600 mr-3"
                             >
-                              ✏️ Editar
+                              {t('edit')}
                             </button>
                             <button
-                              onClick={() => handleDeleteTransaction(t.id)}
+                              onClick={() => handleDeleteTransaction(transaction.id)}
                               className="text-red-400 hover:text-red-600"
                             >
-                              🗑️ Eliminar
+                              {t('delete')}
                             </button>
                           </td>
                         </tr>
@@ -794,7 +805,7 @@ ${JSON.stringify(transactions, null, 2)}
                     ) : (
                       <tr>
                         <td colSpan={4} className="px-6 py-4 text-center text-gray-400">
-                          No hay transacciones registradas para esta tienda.
+                          {t('no_transactions_for_this_store')}
                         </td>
                       </tr>
                     )}
@@ -806,14 +817,14 @@ ${JSON.stringify(transactions, null, 2)}
 
           {currentTab === 'stores' && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-200 mb-6">🏪 Gestor de Tiendas</h2>
+              <h2 className="text-2xl font-bold text-gray-200 mb-6">{t('manage_stores')}</h2>
               <div className="space-y-4">
                 {Object.entries(storeInfoMap).length > 0 ? (
                   Object.entries(storeInfoMap).map(([store, count]) => (
                     <div key={store} className="bg-gray-700 rounded-lg p-4 flex justify-between items-center shadow-sm">
                       <div>
                         <p className="text-lg text-gray-100 font-semibold">{store}</p>
-                        <p className="text-sm text-gray-400">Transacciones: {count}</p>
+                        <p className="text-sm text-gray-400">{t('transactions')} {count}</p>
                       </div>
                       <div className="flex space-x-3">
                         <button
@@ -824,7 +835,7 @@ ${JSON.stringify(transactions, null, 2)}
                           }}
                           className="text-indigo-400 hover:text-indigo-600"
                         >
-                          ✏️ Renombrar
+                          {t('rename')}
                         </button>
                         <button
                           onClick={() => {
@@ -833,29 +844,29 @@ ${JSON.stringify(transactions, null, 2)}
                           }}
                           className="text-red-400 hover:text-red-600"
                         >
-                          🗑️ Eliminar
+                          {t('delete')}
                         </button>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-gray-400">No hay tiendas registradas.</p>
+                  <p className="text-center text-gray-400">{t('no_stores_registered')}</p>
                 )}
               </div>
             </div>
           )}  
             {currentTab === 'ai' && (
               <div>
-                <h2 className="text-2xl font-bold text-gray-200 mb-6">🤖 Preguntar a la IA sobre Contabilidad</h2>
+                <h2 className="text-2xl font-bold text-gray-200 mb-6">{t('ask_ai_about_accounting')}</h2>
                 <div className="mb-4">
-                  <label htmlFor="ai-question" className="block text-gray-300 text-sm font-bold mb-2">Tu pregunta:</label>
+                  <label htmlFor="ai-question" className="block text-gray-300 text-sm font-bold mb-2">{t('your_question')}</label>
                   <textarea
                     id="ai-question"
                     value={aiQuestion}
                     onChange={(e) => setAiQuestion(e.target.value)}
                     rows={5}
                     className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                    placeholder="Ej: ¿Cuál fue mi gasto total el mes pasado?"
+                    placeholder={t('ask_me_something')}
                   />
                 </div>
                 <div className="text-center mb-6">
@@ -864,12 +875,12 @@ ${JSON.stringify(transactions, null, 2)}
                     disabled={aiLoading}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors text-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {aiLoading ? 'Cargando...' : '🤔 Pregúntame algo'}
+                    {aiLoading ? t('loading') : t('ask_me_something')}
                   </button>
                 </div>
 
                 {aiLoading && (
-                  <div className="text-center text-blue-400">Cargando respuesta de la IA...</div>
+                  <div className="text-center text-blue-400">{t('loading_ai_response')}</div>
                 )}
                 {aiError && (
                   <div className="bg-red-500 text-white p-3 rounded-md mt-4">
@@ -878,7 +889,7 @@ ${JSON.stringify(transactions, null, 2)}
                 )}
                 {aiResponse && (
                   <div className="bg-gray-700 p-4 rounded-lg shadow-inner mt-4 max-h-64 overflow-y-auto">
-                    <h3 className="text-xl font-bold text-gray-200 mb-2">Respuesta de la IA:</h3>
+                    <h3 className="text-xl font-bold text-gray-200 mb-2">{t('ai_response')}</h3>
                     <p className="text-gray-300 whitespace-pre-wrap">{aiResponse}</p>
                   </div>
                 )}
@@ -891,17 +902,17 @@ ${JSON.stringify(transactions, null, 2)}
         {showApiKeyModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
             <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
-              <h2 className="text-2xl font-bold text-gray-200 mb-6">Ingresar API Key de Gemini</h2>
+              <h2 className="text-2xl font-bold text-gray-200 mb-6">{t('enter_gemini_api_key')}</h2>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="api-key-input" className="block text-gray-300 text-sm font-bold mb-2">API Key:</label>
+                  <label htmlFor="api-key-input" className="block text-gray-300 text-sm font-bold mb-2">{t('api_key')}</label>
                   <input
                     id="api-key-input"
                     type="password"
                     value={apiKey}
                     onChange={(e) => setApiKey(e.target.value)}
                     className="shadow appearance-none border rounded w-full py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-gray-700 border-gray-600 text-white placeholder-gray-400"
-                    placeholder="Ingresa tu API Key de Gemini"
+                    placeholder={t('enter_gemini_api_key')}
                   />
                 </div>
               </div>
@@ -910,13 +921,13 @@ ${JSON.stringify(transactions, null, 2)}
                   onClick={handleSaveApiKey}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
                 >
-                  💾 Guardar
+                  {t('save')}
                 </button>
                 <button
                   onClick={() => setShowApiKeyModal(false)}
                   className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
                 >
-                  ❌ Cancelar
+                  {t('cancel')}
                 </button>
               </div>
             </div>
@@ -927,10 +938,10 @@ ${JSON.stringify(transactions, null, 2)}
         {showEditModal && editingTransaction && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
             <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-lg">
-              <h2 className="text-2xl font-bold text-gray-200 mb-6">Modificar Transacción</h2>
+              <h2 className="text-2xl font-bold text-gray-200 mb-6">{t('modify_transaction')}</h2>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="edit-amount" className="block text-gray-300 text-sm font-bold mb-2">Monto:</label>
+                  <label htmlFor="edit-amount" className="block text-gray-300 text-sm font-bold mb-2">{t('amount')}</label>
                   <input
                     id="edit-amount"
                     type="number"
@@ -941,7 +952,7 @@ ${JSON.stringify(transactions, null, 2)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="edit-description" className="block text-gray-300 text-sm font-bold mb-2">Descripción:</label>
+                  <label htmlFor="edit-description" className="block text-gray-300 text-sm font-bold mb-2">{t('description')}</label>
                   <input
                     id="edit-description"
                     type="text"
@@ -951,7 +962,7 @@ ${JSON.stringify(transactions, null, 2)}
                   />
                 </div>
                 <div>
-                  <label htmlFor="edit-store" className="block text-gray-300 text-sm font-bold mb-2">Tienda:</label>
+                  <label htmlFor="edit-store" className="block text-gray-300 text-sm font-bold mb-2">{t('store_name')}</label>
                   <input
                     id="edit-store"
                     type="text"
@@ -961,7 +972,7 @@ ${JSON.stringify(transactions, null, 2)}
                   />
                 </div>
                 <fieldset className="flex flex-col">
-                  <legend className="block text-gray-300 text-sm font-bold mb-2">Tipo:</legend>
+                  <legend className="block text-gray-300 text-sm font-bold mb-2">{t('type')}</legend>
                   <div className="flex space-x-4">
                     <label htmlFor="edit-type-ingreso" className="inline-flex items-center">
                       <input
@@ -973,7 +984,7 @@ ${JSON.stringify(transactions, null, 2)}
                         checked={editType === 'Ingreso'}
                         onChange={() => setEditType('Ingreso')}
                       />
-                      <span className="ml-2 text-gray-100">Ingreso</span>
+                      <span className="ml-2 text-gray-100">{t('income')}</span>
                     </label>
                     <label htmlFor="edit-type-gasto" className="inline-flex items-center">
                       <input
@@ -985,7 +996,7 @@ ${JSON.stringify(transactions, null, 2)}
                         checked={editType === 'Gasto'}
                         onChange={() => setEditType('Gasto')}
                       />
-                      <span className="ml-2 text-gray-100">Gasto</span>
+                      <span className="ml-2 text-gray-100">{t('expense')}</span>
                     </label>
                   </div>
                 </fieldset>
@@ -995,13 +1006,13 @@ ${JSON.stringify(transactions, null, 2)}
                   onClick={handleUpdateTransaction}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
                 >
-                  💾 Guardar Cambios
+                  {t('save_changes')}
                 </button>
                 <button
                   onClick={() => setShowEditModal(false)}
                   className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
                 >
-                  ❌ Cancelar
+                  {t('cancel')}
                 </button>
               </div>
             </div>
@@ -1012,20 +1023,20 @@ ${JSON.stringify(transactions, null, 2)}
         {showDeleteModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
             <div className="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md text-center">
-              <h2 className="text-2xl font-bold text-red-400 mb-6">¡Atención!</h2>
-              <p className="text-gray-200 mb-8">¿Estás seguro de que quieres eliminar esta transacción?</p>
+              <h2 className="text-2xl font-bold text-red-400 mb-6">{t('attention')}</h2>
+              <p className="text-gray-200 mb-8">{t('are_you_sure_you_want_to_delete_this_transaction')}</p>
               <div className="flex justify-center space-x-6">
                 <button
                   onClick={confirmDeleteTransaction}
                   className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
                 >
-                  ✅ Sí, Eliminar
+                  {t('yes_delete')}
                 </button>
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors"
                 >
-                  ❌ Cancelar
+                  {t('cancel')}
                 </button>
               </div>
             </div>
@@ -1036,17 +1047,17 @@ ${JSON.stringify(transactions, null, 2)}
         {storeEditModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
             <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md shadow-xl">
-              <h2 className="text-2xl text-gray-200 font-bold mb-4">✏️ Renombrar Tienda</h2>
-              <p className="text-gray-300 mb-4">Renombrando: <span className="font-semibold text-blue-300">{storeToEdit}</span></p>
+              <h2 className="text-2xl text-gray-200 font-bold mb-4">{t('rename_store')}</h2>
+              <p className="text-gray-300 mb-4">{t('renaming')} <span className="font-semibold text-blue-300">{storeToEdit}</span></p>
               <div>
-                <label htmlFor="new-store-name-modal" className="block text-gray-300 text-sm font-bold mb-2">Nuevo nombre de la tienda:</label>
+                <label htmlFor="new-store-name-modal" className="block text-gray-300 text-sm font-bold mb-2">{t('new_store_name')}</label>
                 <input
                   id="new-store-name-modal"
                   type="text"
                   value={newStoreName}
                   onChange={(e) => setNewStoreName(e.target.value)}
                   className="w-full py-2 px-3 rounded bg-gray-700 text-white placeholder-gray-400 mb-6"
-                  placeholder="Nuevo nombre de tienda"
+                  placeholder={t('new_store_name')}
                 />
               </div>
               <div className="flex justify-end space-x-4">
@@ -1054,13 +1065,13 @@ ${JSON.stringify(transactions, null, 2)}
                   onClick={handleRenameStore}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg"
                 >
-                  Guardar
+                  {t('save_plain')}
                 </button>
                 <button
                   onClick={() => setStoreEditModal(false)}
                   className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg"
                 >
-                  Cancelar
+                  {t('cancel_plain')}
                 </button>
               </div>
             </div>
@@ -1071,20 +1082,20 @@ ${JSON.stringify(transactions, null, 2)}
         {storeDeleteModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
             <div className="bg-gray-800 p-6 rounded-lg w-full max-w-md shadow-xl text-center">
-              <h2 className="text-2xl text-red-400 font-bold mb-4">🗑️ Eliminar Tienda</h2>
-              <p className="text-gray-100 mb-6">¿Seguro que quieres eliminar la tienda “<span className="font-semibold text-red-300">{storeToDelete}</span>” y todas sus transacciones?</p>
+              <h2 className="text-2xl text-red-400 font-bold mb-4">{t('delete_store')}</h2>
+              <p className="text-gray-100 mb-6">{t('are_you_sure_you_want_to_delete_store', { storeToDelete })}</p>
               <div className="flex justify-center space-x-6">
                 <button
                   onClick={confirmDeleteStore}
                   className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg"
                 >
-                  Eliminar
+                  {t('delete_plain')}
                 </button>
                 <button
                   onClick={() => setStoreDeleteModal(false)}
                   className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg"
                 >
-                  Cancelar
+                  {t('cancel_plain')}
                 </button>
               </div>
             </div>

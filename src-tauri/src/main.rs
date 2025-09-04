@@ -17,6 +17,7 @@ use tauri::State;
 use log::{info, debug, error, warn}; // Import debug, error, and warn
 use std::io::{BufRead, BufReader, Write};
 use std::fs::{File, OpenOptions};
+use locale_config::Locale; // Added for language detection
 
 // --- Estructuras de Datos de la Aplicación ---
 
@@ -130,6 +131,16 @@ async fn save_transactions_to_file(transactions: &[Transaction]) -> Result<(), S
 }
 
 // --- Comandos Tauri (accesibles desde el frontend) ---
+
+/// Comando para obtener el idioma del sistema.
+#[tauri::command]
+fn get_system_locale() -> String {
+    let locale = Locale::current();
+    let lang = locale.to_string(); // Get the full locale string (e.g., "en-US", "es-ES")
+    let primary_lang = lang.split('-').next().unwrap_or("en").to_string(); // Extract primary language
+    debug!("Detected system locale: {}", primary_lang);
+    primary_lang
+}
 
 /// Comando para obtener todas las transacciones.
 #[tauri::command]
@@ -626,7 +637,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             format_currency_es_ea_command,
             get_store_info_command,
             rename_store_command,
-            delete_store_command
+            delete_store_command,
+            get_system_locale // Add this line
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
