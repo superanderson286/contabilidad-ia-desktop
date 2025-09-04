@@ -10,7 +10,6 @@
   "summary_reports": "📈 Resumen y Reportes",
   "ask_ai": "🤖 Preguntar a la IA",
   "manage_stores": "🏪 Gestionar Tiendas",
-  "visit_web": "🌐 Visitar la Web",
   "status_message": "Mensaje de Estado",
   "register_new_transaction": "📝 Registrar Nueva Transacción",
   "amount": "Monto:",
@@ -24,7 +23,6 @@
   "register_transaction": "✅ Registrar Transacción",
   "summary_and_reports": "📈 Resumen y Reportes",
   "ask_the_ai": "🤖 Preguntar a la IA",
-  "visit_the_web": "🌐 Visitar la Web",
   "or_select_an_existing_one": "O selecciona una existente:",
   "you_can_type_a_new_name...": "Puedes escribir un nuevo nombre o seleccionar uno existente.",
   "select_store": "Seleccionar Tienda:",
@@ -72,5 +70,6 @@
   "delete_plain": "Eliminar",
   "all_stores": "Todas las Tiendas",
   "cannot_rename_all_stores": "No se puede renombrar 'Todas las Tiendas'.",
-  "cannot_delete_all_stores": "No se puede eliminar 'Todas las Tiendas'."
+  "cannot_delete_all_stores": "No se puede eliminar 'Todas las Tiendas'.",
+  "donate": "💖 Donar"
 }

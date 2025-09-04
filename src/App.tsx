@@ -585,10 +585,10 @@ ${JSON.stringify(transactions, null, 2)}
             {t('manage_stores')}
           </button>
           <button
-              onClick={() => open('https://contabilidad-ia-web.vercel.app/')}
-              className="px-4 py-2 rounded-md font-semibold text-blue-200 hover:bg-gray-700 transition-colors ml-auto"
+              onClick={() => open('https://contabilidad-ia-web.vercel.app/support')}
+              className="px-4 py-2 rounded-md font-semibold text-white bg-pink-500 hover:bg-pink-600 transition-colors ml-auto shadow-lg transform hover:scale-105"
           >
-              {t('visit_the_web')}
+              {t('donate')}
           </button>
         </div>
 

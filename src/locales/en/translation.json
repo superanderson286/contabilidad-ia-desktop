@@ -10,7 +10,6 @@
   "summary_reports": "Summary & Reports",
   "ask_ai": "Ask AI",
   "manage_stores": "Manage Stores",
-  "visit_web": "Visit Web",
   "status_message": "Status Message",
   "register_new_transaction": "Register New Transaction",
   "amount": "Amount:",
@@ -24,7 +23,6 @@
   "register_transaction": "Register Transaction",
   "summary_and_reports": "📈 Summary & Reports",
   "ask_the_ai": "🤖 Ask the AI",
-  "visit_the_web": "🌐 Visit the Web",
   "or_select_an_existing_one": "Or select an existing one:",
   "you_can_type_a_new_name...": "You can type a new name or select an existing one.",
   "select_store": "Select Store:",
@@ -72,5 +70,6 @@
   "delete_plain": "Delete",
   "all_stores": "All Stores",
   "cannot_rename_all_stores": "Cannot rename 'All Stores'.",
-  "cannot_delete_all_stores": "Cannot delete 'All Stores'."
+  "cannot_delete_all_stores": "Cannot delete 'All Stores'.",
+  "donate": "💖 Donate"
 }
